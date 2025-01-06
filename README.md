@@ -195,4 +195,169 @@ JOIN
 ```
 
 >**Typ faktovej tabulky**: Additive Fact Table<br>
->Faktová tabuľka obsahuje metriky, ktoré je možné sčítať vo všetkých dimenziách (napr. Quantity, UnitPrice, Total).\
+>Faktová tabuľka obsahuje metriky, ktoré je možné sčítať vo všetkých dimenziách (napr. Quantity, UnitPrice, Total).
+
+Po vytvoreni dimenzii a faktovej tabulky boli data nahrate do tychto tabuliek. Nasledne boli staging tabulky odstranene pre optimalizaciu vyuzitia uloziska.
+
+```sql
+DROP TABLE IF EXISTS album;
+DROP TABLE IF EXISTS artist;
+DROP TABLE IF EXISTS customer;
+DROP TABLE IF EXISTS employee;
+DROP TABLE IF EXISTS genre;
+DROP TABLE IF EXISTS invoiceline;
+DROP TABLE IF EXISTS invoice;
+DROP TABLE IF EXISTS mediatype;
+DROP TABLE IF EXISTS playlisttrack;
+DROP TABLE IF EXISTS track;
+```
+
+Vysledkom ETL procesu bolo rychle a efektivne spracovanie `.csv` suborov pre vytvorenie definovaneho multidimenzionalneho modelu typu star. Na dalsiu analyzu boli vytvorene `View` v scheme `public`:
+
+- `peak_minimum_orders` - Zobrazuje pocet objednavok pre kazdy mesiac, identifikuje obdobia najvacsej a najmensiej aktivity, co je uzitocne na sledovanie sezonalnych trendov.
+
+```sql
+CREATE OR REPLACE VIEW peak_minimum_orders AS
+SELECT
+    d.year AS Year,
+    d.month AS Month,
+    COUNT(s.Sales_factId) AS Total_Orders
+FROM 
+    sales_fact s
+JOIN 
+    dim_time d ON s.dim_time_TimeId = d.TimeId
+GROUP BY 
+    d.year, d.month
+ORDER BY 
+    Total_Orders DESC;
+```
+
+- `orders_by_country` - Vizualizuje, ktore krajiny zadavaju najviac objednavok, s geografickym rozlozenim popularity.
+
+```sql
+CREATE OR REPLACE VIEW orders_by_country AS
+SELECT 
+    da.Country AS Country,
+    COUNT(s.Sales_factId) AS TotalOrders
+FROM 
+    sales_fact s
+JOIN 
+    dim_address da ON s.dim_address_AddressId = da.AddressId
+GROUP BY  
+    da.Country
+ORDER BY 
+    TotalOrders DESC
+LIMIT 10;
+```
+
+- `employees_by_country` - Identifikuje krajinu s najvacsim poctom zamestnancov, co moze pomoct pri analyzovani alokacie zdrojov.
+
+```sql
+CREATE OR REPLACE VIEW employees_by_country AS
+SELECT 
+    da.Country AS Country,
+    COUNT(de.EmployeeId) AS TotalEmployees
+FROM 
+    dim_employee de
+JOIN 
+    dim_address da ON de.EmployeeId = da.AddressId
+GROUP BY 
+    da.Country
+ORDER BY 
+    TotalEmployees DESC
+LIMIT 10;
+```
+
+- `most_popular_track` - Zvysuje skladbu s najvacsim poctom objednavok, co umoznuje pochopit preferencie zakaznikov.
+
+```sql
+CREATE OR REPLACE VIEW most_popular_track AS
+SELECT 
+    dt.TrackName AS TrackName,
+    COUNT(s.Sales_factId) AS OrderCount
+FROM 
+    dim_track dt
+JOIN 
+    sales_fact s ON dt.TrackId = s.dim_track_TrackId
+GROUP BY 
+    dt.TrackName
+ORDER BY 
+    OrderCount DESC
+LIMIT 10;
+```
+
+- `top_loyal_customers` - Zoznam najaktivnejsich kupujucich s poctom objednavok a celkovou sumou ich nakupov, ktory pomaha identifikovat klucovych zakaznikov.
+
+```sql
+CREATE OR REPLACE VIEW top_loyal_customers AS
+SELECT 
+    dc.CustomerId AS CustomerId,
+    CONCAT(dc.FirstName, ' ', dc.LastName) AS CustomerName,
+    COUNT(s.Sales_factId) AS TotalOrders,
+    SUM(s.Total) AS TotalSpent
+FROM 
+    dim_customer dc
+JOIN 
+    sales_fact s ON dc.CustomerId = s.dim_customer_CustomerId
+GROUP BY 
+    dc.CustomerId, CustomerName
+ORDER BY 
+    TotalOrders DESC
+LIMIT 10;
+```
+
+## 4. Vizualizacia dat
+
+Bolo navrhnutych **5 vizualizacii**
+
+### 1. Mesacny pocet objednavok:
+
+<p align="center">
+  <img src="https://github.com/aiyanurram/chinook_db_projekt/blob/main/vizualization/vizual1.png">
+  <br>
+  <em>Mesacny pocet objednavok</em>
+</p>
+
+Tabulka zobrazuje pocet objednavok za jednotlive mesiace, co umoznuje identifikovat najrusnejsie a najmenej aktivne obdobia.
+
+### 2. Pocet objednavok podla krajiny:
+
+<p align="center">
+  <img src="https://github.com/aiyanurram/chinook_db_projekt/blob/main/vizualization/vizual2.png">
+  <br>
+  <em>Pocet objednavok podla krajiny</em>
+</p>
+
+Tabulka ukazuje, ktore krajiny uskutučnuju najviac objednavok, co pomaha analyzovat geograficke trendy.
+
+### 3. Pocet zamestnancov podla krajiny: 
+
+<p align="center">
+  <img src="https://github.com/aiyanurram/chinook_db_projekt/blob/main/vizualization/vizual3.png">
+  <br>
+  <em>Pocet zamestnancov podla krajiny</em>
+</p>
+
+Tabulka identifikuje krajinu s najvacsim poctom zamestnancov, co moze nazancovat rozlozenie ludskeho zdroja.
+
+### 4. Najoblubenejsia skladba: 
+
+<p align="center">
+  <img src="https://github.com/aiyanurram/chinook_db_projekt/blob/main/vizualization/vizual4.png">
+  <br>
+  <em>Najoblubenejsia skladba</em>
+</p>
+
+Tabulka ukazuje skladbu s najvacsim poctom objednavok, co pomaha pochopit hudobne preferencie zakaznikov.
+
+### 5. Top 10 vernych zakaznikov:
+
+<p align="center">
+  <img src="https://github.com/aiyanurram/chinook_db_projekt/blob/main/vizualization/vizual5.png">
+  <br>
+  <em>Top 10 vernych zakaznikov</em>
+</p>
+
+Tabulka zobrazuje najaktivnejsich zakaznikov s poctom objednavok a celkovou sumou nakupov, co identifikuje klucovych klientov.
+
+_autor: Aiyanur Ramazan_
