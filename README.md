@@ -313,7 +313,7 @@ Bolo navrhnutych **5 vizualizacii**
 ### 1. Mesacny pocet objednavok:
 
 <p align="center">
-  <img src="https://github.com/aiyanurram/chinook_db_projekt/blob/main/vizualization/vizual1.png">
+  <img src="https://github.com/aiyanurram/chinook_db_projekt/blob/main/vizualization/v4.png">
   <br>
   <em>Mesacny pocet objednavok</em>
 </p>
@@ -323,7 +323,7 @@ Tabulka zobrazuje pocet objednavok za jednotlive mesiace, co umoznuje identifiko
 ### 2. Pocet objednavok podla krajiny:
 
 <p align="center">
-  <img src="https://github.com/aiyanurram/chinook_db_projekt/blob/main/vizualization/vizual2.png">
+  <img src="https://github.com/aiyanurram/chinook_db_projekt/blob/main/vizualization/v1.png">
   <br>
   <em>Pocet objednavok podla krajiny</em>
 </p>
@@ -333,7 +333,7 @@ Tabulka ukazuje, ktore krajiny uskutučnuju najviac objednavok, co pomaha analyz
 ### 3. Pocet zamestnancov podla krajiny: 
 
 <p align="center">
-  <img src="https://github.com/aiyanurram/chinook_db_projekt/blob/main/vizualization/vizual3.png">
+  <img src="https://github.com/aiyanurram/chinook_db_projekt/blob/main/vizualization/v5.png">
   <br>
   <em>Pocet zamestnancov podla krajiny</em>
 </p>
@@ -343,7 +343,7 @@ Tabulka identifikuje krajinu s najvacsim poctom zamestnancov, co moze nazancovat
 ### 4. Najoblubenejsia skladba: 
 
 <p align="center">
-  <img src="https://github.com/aiyanurram/chinook_db_projekt/blob/main/vizualization/vizual4.png">
+  <img src="https://github.com/aiyanurram/chinook_db_projekt/blob/main/vizualization/v3.png">
   <br>
   <em>Najoblubenejsia skladba</em>
 </p>
@@ -353,7 +353,7 @@ Tabulka ukazuje skladbu s najvacsim poctom objednavok, co pomaha pochopit hudobn
 ### 5. Top 10 vernych zakaznikov:
 
 <p align="center">
-  <img src="https://github.com/aiyanurram/chinook_db_projekt/blob/main/vizualization/vizual5.png">
+  <img src="https://github.com/aiyanurram/chinook_db_projekt/blob/main/vizualization/v2.png">
   <br>
   <em>Top 10 vernych zakaznikov</em>
 </p>
